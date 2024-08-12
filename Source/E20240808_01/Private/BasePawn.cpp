@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/BoxComponent.h"
+#include "MyPlayerController.h"
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -38,38 +39,60 @@ ABasePawn::ABasePawn()
 	OverlapCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapCollision"));
 	OverlapCollision->SetupAttachment(RootComponent);
 
-	IsOverlaped = false;
 }
 
 // Called when the game starts or when spawned
 void ABasePawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
 }
 
 void ABasePawn::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-	//overlap이벤트가 되었을떄 플레이어컨트롤러 가져와서
-	//otherActor에 posses해줌
-	//bool overlap == true
-
 	if (ABasePawn* otherPawn = Cast<ABasePawn>(OtherActor))
 	{
-		ReceivePossessed
+		PossessedPawn = otherPawn;
 	}
-	GetController();
-	IsOverlaped = true;
 
-
+	Super::NotifyActorBeginOverlap(OtherActor);
 }
 
 void ABasePawn::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	Super::NotifyActorEndOverlap(OtherActor);
+	PossessedPawn = nullptr;
 
-	IsOverlaped = false;
+	Super::NotifyActorEndOverlap(OtherActor);
+}
+
+void ABasePawn::UnPossessed()
+{
+	AController* controller = GetController();
+	AMyPlayerController* cont = Cast< AMyPlayerController>(controller);
+	cont->jumpDelegate.Clear();
+	cont->stopJumpDelegate.Clear();
+
+	Super::UnPossessed();
+}
+
+void ABasePawn::PossessedBy(AController* controller)
+{
+	AMyPlayerController* cont = Cast< AMyPlayerController>(controller);
+	cont->jumpDelegate.AddDynamic(this, &ABasePawn::Jump);
+	cont->stopJumpDelegate.AddDynamic(this, &ABasePawn::StopJump);
+
+	Super::PossessedBy(controller);
+}
+
+void ABasePawn::Jump()
+{
+	FVector UpVec = GetActorUpVector();
+	float JumpMulti = 30.0f;
+	AddActorWorldOffset(UpVec * JumpMulti);
+}
+
+void ABasePawn::StopJump()
+{
+	FVector UpVec = GetActorUpVector();
+	float JumpMulti = -30.0f;
+	AddActorWorldOffset(UpVec * JumpMulti);
 }

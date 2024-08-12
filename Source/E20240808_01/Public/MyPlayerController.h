@@ -16,6 +16,7 @@ class E20240808_01_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputMappingContext* DefaultMappingContext;
@@ -29,11 +30,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* PossessAction;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumpDelegate);
+
+	UPROPERTY(BlueprintAssignable)
+	FJumpDelegate jumpDelegate;
+	FJumpDelegate stopJumpDelegate;
+
 	APawn* MyPawn;
 
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
 	void Jump();
 	void StopJumping();
+	void HasPossess();
 	virtual void SetupInputComponent() override;
 };

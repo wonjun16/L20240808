@@ -4,7 +4,7 @@
 #include "MyGameMode.h"
 #include "MyHUD.h"
 #include "MyPlayerController.h"
-#include "Public/BasePawn.h"
+#include "BasePawn.h"
 
 AMyGameMode::AMyGameMode()
 {

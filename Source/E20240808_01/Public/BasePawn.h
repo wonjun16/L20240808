@@ -42,8 +42,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Default")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
 
-	bool IsOverlaped;
+	class ABasePawn* PossessedPawn;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
+	virtual void UnPossessed() override;
+	virtual void PossessedBy(AController*) override;
+	UFUNCTION()
+	void Jump();
+	UFUNCTION()
+	void StopJump();
 };

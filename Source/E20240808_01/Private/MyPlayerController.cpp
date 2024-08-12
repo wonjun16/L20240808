@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MyPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
+#include "BasePawn.h"
 
 void AMyPlayerController::Move(const FInputActionValue& value)
 {
@@ -51,12 +51,10 @@ void AMyPlayerController::Jump()
 	{
 		character->Jump();
 	}
-	else
+	else if(ABasePawn* pawn = Cast<ABasePawn>(MyPawn))
 	{
-		FVector UpVec = MyPawn->GetActorUpVector();
-		float JumpMulti = 30.0f;
-
-		MyPawn->AddActorWorldOffset(UpVec * JumpMulti);
+		jumpDelegate.Broadcast();
+		//pawn->Jump();
 	}
 }
 
@@ -69,10 +67,20 @@ void AMyPlayerController::StopJumping()
 	}
 	else
 	{
-		FVector UpVec = MyPawn->GetActorUpVector();
-		float JumpMulti = -30.0f;
+		stopJumpDelegate.Broadcast();
+	}
+}
 
-		MyPawn->AddActorWorldOffset(UpVec * JumpMulti);
+void AMyPlayerController::HasPossess()
+{
+	MyPawn = GetPawn();
+	if (ABasePawn* MyBasePawn = Cast<ABasePawn>(MyPawn))
+	{
+		if (MyBasePawn->PossessedPawn)
+		{
+			ABasePawn* PossessedPawn = MyBasePawn->PossessedPawn;
+			Possess(PossessedPawn);
+		}
 	}
 }
 
@@ -97,5 +105,8 @@ void AMyPlayerController::SetupInputComponent()
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyPlayerController::Look);
+
+		// Possessing
+		EnhancedInputComponent->BindAction(PossessAction, ETriggerEvent::Started, this, &AMyPlayerController::HasPossess);
 	}
 }
