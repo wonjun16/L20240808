@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "MyInterface.h"
 #include "BasePawn.generated.h"
 
 UCLASS()
-class E20240808_01_API ABasePawn : public APawn
+class E20240808_01_API ABasePawn : public APawn, public IMyInterface
 {
 	GENERATED_BODY()
 
@@ -52,4 +53,9 @@ public:
 	void Jump();
 	UFUNCTION()
 	void StopJump();
+	void AddGameScore_Implementation() override;
+	//UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Scoress")
+	static int Score;
+
+	virtual void Test() override;
 };

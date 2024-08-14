@@ -9,6 +9,9 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/BoxComponent.h"
 #include "MyPlayerController.h"
+#include "MyActor1.h"
+
+int ABasePawn::Score = 0;
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -39,6 +42,7 @@ ABasePawn::ABasePawn()
 	OverlapCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapCollision"));
 	OverlapCollision->SetupAttachment(RootComponent);
 
+	Score = 0;
 }
 
 // Called when the game starts or when spawned
@@ -52,6 +56,10 @@ void ABasePawn::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (ABasePawn* otherPawn = Cast<ABasePawn>(OtherActor))
 	{
 		PossessedPawn = otherPawn;
+	}
+	if (AMyActor1* myActor = Cast<AMyActor1>(OtherActor))
+	{
+		IMyInterface::Execute_AddGameScore(this);
 	}
 
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -96,3 +104,18 @@ void ABasePawn::StopJump()
 	float JumpMulti = -30.0f;
 	AddActorWorldOffset(UpVec * JumpMulti);
 }
+
+void ABasePawn::AddGameScore_Implementation()
+{
+	++ABasePawn::Score;
+}
+
+void ABasePawn::Test()
+{
+	//++ABasePawn::Score;
+}
+
+//void ABasePawn::AddGameScore()
+//{
+//	Score++;
+//}
